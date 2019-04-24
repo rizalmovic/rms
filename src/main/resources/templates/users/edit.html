@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" layout:decorate="~{layouts/main}">
+<head>
+    <title>Manage User</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Editing user</h1>
+
+    <form th:action="@{/users/{id}/edit( id = ${user.id})}" th:object="${user}" method="post" class="ui form">
+        <div class="field">
+            <label for="name" th:classappend="${#fields.hasErrors('name')} ? error : ''">Name</label>
+            <input type="text" name="name" placeholder="Full Name" th:value="${user.name}">
+        </div>
+        <div class="field" th:classappend="${#fields.hasErrors('username')} ? error : ''">
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Username" th:value="${user.username}">
+        </div>
+        <div class="field" th:classappend="${#fields.hasErrors('email')} ? error : ''">
+            <label for="email">Email Address</label>
+            <input type="email" name="email" placeholder="Email Address" th:value="${user.email}">
+        </div>
+        <button class="ui primary button">Submit</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<div class="ui inverted large top fixed hidden menu" th:fragment="navbar">
+    <div class="ui container">
+        <a class="active item" href="/">RMS</a>
+        <a class="item" sec:authorize="hasAuthority('admin')" href="/admin/users">Users</a>
+        <a class="item" href="/about">About</a>
+        <div class="right menu">
+            <div class="item" sec:authorize="!isAuthenticated()">
+                <a class="ui button" href="/login">Log in</a>
+            </div>
+            <div class="item" sec:authorize="isAuthenticated()">
+                <a class="ui button" href="/logout">Log out</a>
+            </div>
+            <div class="item" sec:authorize="!isAuthenticated()">
+                <a class="ui primary button">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</div>
