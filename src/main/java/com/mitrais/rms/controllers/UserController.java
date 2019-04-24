@@ -1,27 +1,30 @@
 package com.mitrais.rms.controllers;
 
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import com.mitrais.rms.domains.User;
 import com.mitrais.rms.repositories.RoleRepository;
 import com.mitrais.rms.repositories.UserRepository;
 import com.mitrais.rms.validators.UserValidator;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.security.Principal;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/admin")
@@ -45,10 +48,6 @@ public class UserController {
     public String index(Model model, Pageable pageable, Authentication auth) {
         Iterable<User> users = this.userRepository.findAll(pageable);
         model.addAttribute("users", users);
-
-        auth.getAuthorities().stream().forEach(x -> {
-            System.out.println(((GrantedAuthority) x).getAuthority().toString());
-        });
         return "users/index";
     }
 
@@ -61,14 +60,14 @@ public class UserController {
 
     @PostMapping("/users/create")
     public String save(@Valid User user, BindingResult result, ModelMap model) {
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             model.put("user", user);
             return "user/create";
         } else {
             PasswordEncoder encoder = new BCryptPasswordEncoder();
             user.setPassword(encoder.encode(user.getPassword()));
             userRepository.save(user);
-            return "redirect:/users";
+            return "redirect:/admin/users";
         }
     }
 
@@ -77,8 +76,8 @@ public class UserController {
 
         Optional<User> result = userRepository.findById(id);
 
-        if(!result.isPresent()) {
-            return "redirect:/users";
+        if (!result.isPresent()) {
+            return "redirect:/admin/users";
         } else {
             model.put("user", result.get());
             return "users/edit";
@@ -92,13 +91,13 @@ public class UserController {
             return "users/edit";
         } else {
             userRepository.save(user);
-            return "redirect:/users";
+            return "redirect:/admin/users";
         }
     }
 
     @GetMapping("/users/{id}/delete")
     public String edit(@PathVariable("id") Long id) {
         userRepository.deleteById(id);
-        return "redirect:/users";
+        return "redirect:/admin/users";
     }
 }
